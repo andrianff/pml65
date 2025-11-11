@@ -3,7 +3,12 @@ import { odkClient } from "./odk-client"
 export async function getSubmissions(formId: string) {
   const projectId = odkClient.getProjectId()
   const response = await odkClient.fetchWithAuth(
-    `/v1/projects/${projectId}/forms/${formId}/submissions?X-Extended-Metadata=true`,
+    `/v1/projects/${projectId}/forms/${formId}/submissions`,
+    {
+      headers: {
+        'X-Extended-Metadata': 'true',
+      },
+    }
   )
 
   if (!response.ok) {
