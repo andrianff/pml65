@@ -18,7 +18,7 @@ export async function PATCH(
     }
 
     // Validate reviewState
-    const validStates = ['received', 'hasIssues', 'edited', 'approved'];
+    const validStates = ['received', 'hasIssues', 'edited', 'approved', 'rejected'];
     if (!validStates.includes(reviewState)) {
       return NextResponse.json(
         { error: `Invalid reviewState. Must be one of: ${validStates.join(', ')}` },

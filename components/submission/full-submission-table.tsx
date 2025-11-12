@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface SubmissionData {
   instanceId: string
@@ -14,7 +15,7 @@ interface SubmissionData {
   currentVersion?: {
     instanceName?: string
   }
-  reviewState: "received" | "hasIssues" | "edited" | "approved"
+  reviewState: "received" | "hasIssues" | "edited" | "approved" | null
 }
 
 interface FullSubmissionTableProps {
@@ -30,31 +31,79 @@ const statusMap: Record<string, string> = {
   hasIssues: "bermasalah",
   edited: "diubah",
   approved: "approved",
+  rejected: "ditolak",
+}
+
+const reverseStatusMap: Record<string, string> = {
+  diterima: "received",
+  bermasalah: "hasIssues",
+  diubah: "edited",
+  approved: "approved",
+  ditolak: "rejected",
 }
 
 export function FullSubmissionTable({ filters }: FullSubmissionTableProps) {
   const [submissions, setSubmissions] = useState<SubmissionData[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchSubmissions = async () => {
-      try {
-        const response = await fetch("/api/submissions")
-        const data = await response.json()
-        setSubmissions(data)
-      } catch (error) {
-        console.error("Failed to fetch submissions:", error)
-      } finally {
-        setLoading(false)
-      }
+  const fetchSubmissions = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch("/api/submissions")
+      const data = await response.json()
+      setSubmissions(data)
+    } catch (error) {
+      console.error("Failed to fetch submissions:", error)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchSubmissions()
   }, [])
 
+  const handleStatusChange = async (instanceId: string, newStatus: string) => {
+    try {
+      // Optimistically update UI
+      setSubmissions((prev) =>
+        prev.map((sub) =>
+          sub.instanceId === instanceId
+            ? { ...sub, reviewState: reverseStatusMap[newStatus] as SubmissionData["reviewState"] }
+            : sub
+        )
+      )
+
+      const encodedId = encodeURIComponent(instanceId)
+      const reviewState = reverseStatusMap[newStatus]
+
+      const response = await fetch(`/api/submissions/${encodedId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reviewState }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update status")
+      }
+
+      console.log(`✅ Status updated successfully for ${instanceId}`)
+
+      // Refresh data
+      await fetchSubmissions()
+    } catch (error) {
+      console.error("Error updating status:", error)
+      // Revert on error
+      await fetchSubmissions()
+    }
+  }
+
   const filteredSubmissions = useMemo(() => {
     return submissions.filter((sub) => {
-      if (filters.status && statusMap[sub.reviewState] !== filters.status) return false
+      const mappedStatus = sub.reviewState ? statusMap[sub.reviewState] : "diterima"
+      if (filters.status && mappedStatus !== filters.status) return false
       if (
         filters.submitter &&
         sub.submitter?.displayName.toLowerCase() !== filters.submitter.toLowerCase().replace(/-/g, " ")
@@ -106,26 +155,38 @@ export function FullSubmissionTable({ filters }: FullSubmissionTableProps) {
                 </TableCell>
               </TableRow>
             ) : filteredSubmissions.length > 0 ? (
-              filteredSubmissions.map((submission) => (
-                <TableRow key={submission.instanceId}>
-                  <TableCell className="text-sm">{new Date(submission.createdAt).toLocaleString("id-ID")}</TableCell>
-                  <TableCell className="font-medium">{String(submission.submitterId).padStart(5, "21-")}</TableCell>
-                  <TableCell>{submission.submitter?.displayName || "Unknown"}</TableCell>
-                  <TableCell>{submission.currentVersion?.instanceName || "-"}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${statusColors[statusMap[submission.reviewState]]}`}
-                    >
-                      {statusMap[submission.reviewState]}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm" className="text-xs bg-transparent">
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+              filteredSubmissions.map((submission) => {
+                const currentStatus = submission.reviewState ? statusMap[submission.reviewState] : "diterima"
+                return (
+                  <TableRow key={submission.instanceId}>
+                    <TableCell className="text-sm">{new Date(submission.createdAt).toLocaleString("id-ID")}</TableCell>
+                    <TableCell className="font-medium">
+                      {submission.submitter?.displayName?.match(/\d{2}-\d{3}/)?.[0] || "-"}
+                    </TableCell>
+                    <TableCell>{submission.submitter?.displayName || "Unknown"}</TableCell>
+                    <TableCell>{submission.currentVersion?.instanceName || "-"}</TableCell>
+                    <TableCell>
+                      <Select value={currentStatus} onValueChange={(value) => handleStatusChange(submission.instanceId, value)}>
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="diterima">Diterima</SelectItem>
+                          <SelectItem value="diubah">Diubah</SelectItem>
+                          <SelectItem value="bermasalah">Bermasalah</SelectItem>
+                          <SelectItem value="approved">Approved</SelectItem>
+                          <SelectItem value="ditolak">Ditolak</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm" className="text-xs bg-transparent">
+                        Detail
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8">

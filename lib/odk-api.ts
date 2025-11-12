@@ -55,9 +55,17 @@ export async function getProjects() {
 export async function updateSubmissionStatus(
   formId: string,
   instanceId: string,
-  reviewState: "approved" | "hasIssues" | "edited" | "received",
+  reviewState: "approved" | "hasIssues" | "edited" | "received" | "rejected",
 ) {
   const projectId = odkClient.getProjectId()
+
+  // Map "rejected" to ODK's "hasIssues" with a special flag
+  // Since ODK doesn't support "rejected" natively, we use "hasIssues" for rejected items
+  let odkReviewState = reviewState
+  if (reviewState === "rejected") {
+    odkReviewState = "hasIssues" // Map rejected to hasIssues in ODK
+  }
+
   const response = await odkClient.fetchWithAuth(
     `/v1/projects/${projectId}/forms/${formId}/submissions/${instanceId}`,
     {
@@ -66,7 +74,7 @@ export async function updateSubmissionStatus(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        reviewState,
+        reviewState: odkReviewState,
       }),
     },
   )

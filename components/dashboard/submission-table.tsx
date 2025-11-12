@@ -40,7 +40,7 @@ interface SubmissionData {
   nim: string
   submitter: string
   labelUnit: string
-  status: "diterima" | "diubah" | "bermasalah" | "approved"
+  status: "diterima" | "diubah" | "bermasalah" | "approved" | "ditolak"
 }
 
 // Map ODK reviewState to Indonesian status
@@ -67,6 +67,8 @@ const mapStatusToReviewState = (status: SubmissionData["status"]): string => {
       return "hasIssues"
     case "diubah":
       return "edited"
+    case "ditolak":
+      return "rejected"
     case "diterima":
     default:
       return "received"
@@ -132,6 +134,7 @@ export function SubmissionTable() {
     diterima: "bg-blue-100 text-blue-800",
     diubah: "bg-yellow-100 text-yellow-800",
     bermasalah: "bg-orange-100 text-orange-800",
+    ditolak: "bg-red-100 text-red-800",
   }
 
   const handleStatusChange = async (id: string, newStatus: SubmissionData["status"]) => {
@@ -238,6 +241,7 @@ export function SubmissionTable() {
                         <SelectItem value="diubah">Diubah</SelectItem>
                         <SelectItem value="bermasalah">Bermasalah</SelectItem>
                         <SelectItem value="approved">Approved</SelectItem>
+                        <SelectItem value="ditolak">Ditolak</SelectItem>
                       </SelectContent>
                     </Select>
                   </TableCell>

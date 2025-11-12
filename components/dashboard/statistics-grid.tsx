@@ -67,9 +67,9 @@ export function StatisticsGrid() {
     {
       title: "Diterima",
       value: loading ? "-" : String(stats.diterima),
-      description: "Status accepted",
+      description: "Status received",
       icon: "✅",
-      color: "bg-secondary",
+      color: "bg-blue-500",
     },
     {
       title: "Diubah",
@@ -86,6 +86,13 @@ export function StatisticsGrid() {
       color: "bg-orange-500",
     },
     {
+      title: "Ditolak",
+      value: loading ? "-" : String(stats.ditolak),
+      description: "Submission ditolak",
+      icon: "❌",
+      color: "bg-red-600",
+    },
+    {
       title: "Approved",
       value: loading ? "-" : String(stats.approved),
       description: "Valid dan siap",
@@ -95,7 +102,7 @@ export function StatisticsGrid() {
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {displayStats.map((stat) => (
         <StatCard key={stat.title} {...stat} />
       ))}
