@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SubmissionDetailDialog } from "@/components/submission/submission-detail-dialog"
 
 // ODK Central API Response Types
 interface ODKSubmission {
@@ -79,6 +80,8 @@ export function SubmissionTable() {
   const [submissions, setSubmissions] = useState<SubmissionData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null)
 
   // Fetch submissions from API
   const fetchSubmissions = async () => {
@@ -246,7 +249,15 @@ export function SubmissionTable() {
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" className="text-xs bg-transparent">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs bg-transparent"
+                      onClick={() => {
+                        setSelectedSubmissionId(submission.id)
+                        setDialogOpen(true)
+                      }}
+                    >
                       Detail
                     </Button>
                   </TableCell>
@@ -260,6 +271,19 @@ export function SubmissionTable() {
       <div className="p-4 border-t border-border text-sm text-muted-foreground">
         Total: {submissions.length} submission terbaru
       </div>
+
+      {/* Detail Dialog */}
+      {selectedSubmissionId && (
+        <SubmissionDetailDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          instanceId={selectedSubmissionId}
+          onSave={() => {
+            // Refresh submissions after save
+            fetchSubmissions()
+          }}
+        />
+      )}
     </div>
   )
 }

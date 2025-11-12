@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SubmissionDetailDialog } from "./submission-detail-dialog"
 
 interface SubmissionData {
   instanceId: string
@@ -45,6 +46,8 @@ const reverseStatusMap: Record<string, string> = {
 export function FullSubmissionTable({ filters }: FullSubmissionTableProps) {
   const [submissions, setSubmissions] = useState<SubmissionData[]>([])
   const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null)
 
   const fetchSubmissions = async () => {
     try {
@@ -86,7 +89,18 @@ export function FullSubmissionTable({ filters }: FullSubmissionTableProps) {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to update status")
+        const contentType = response.headers.get("content-type")
+        let errorMessage = "Failed to update status"
+
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorData.error || errorMessage
+        } else {
+          const text = await response.text()
+          console.error("Non-JSON response:", text.substring(0, 200))
+        }
+
+        throw new Error(errorMessage)
       }
 
       console.log(`✅ Status updated successfully for ${instanceId}`)
@@ -95,6 +109,7 @@ export function FullSubmissionTable({ filters }: FullSubmissionTableProps) {
       await fetchSubmissions()
     } catch (error) {
       console.error("Error updating status:", error)
+      alert(`Error: ${error instanceof Error ? error.message : "Unknown error"}`)
       // Revert on error
       await fetchSubmissions()
     }
@@ -180,7 +195,15 @@ export function FullSubmissionTable({ filters }: FullSubmissionTableProps) {
                       </Select>
                     </TableCell>
                     <TableCell>
-                      <Button variant="outline" size="sm" className="text-xs bg-transparent">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs bg-transparent"
+                        onClick={() => {
+                          setSelectedSubmissionId(submission.instanceId)
+                          setDialogOpen(true)
+                        }}
+                      >
                         Detail
                       </Button>
                     </TableCell>
@@ -202,6 +225,19 @@ export function FullSubmissionTable({ filters }: FullSubmissionTableProps) {
         <span>Total: {filteredSubmissions.length} submission</span>
         <span className="text-xs">PKL 65 Polstat STIS</span>
       </div>
+
+      {/* Detail Dialog */}
+      {selectedSubmissionId && (
+        <SubmissionDetailDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          instanceId={selectedSubmissionId}
+          onSave={() => {
+            // Refresh submissions after save
+            fetchSubmissions()
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -1,11 +1,29 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Rakkas, IBM_Plex_Sans, Yanone_Kaffeesatz } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+// HEADLINE font
+const rakkas = Rakkas({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-headline"
+})
+
+// MAIN font (IBM Plex Sans as alternative to Bell Gothic)
+const ibmPlexSans = IBM_Plex_Sans({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-main"
+})
+
+// SUB/COMPLIMENTS font
+const yanoneKaffeesatz = Yanone_Kaffeesatz({
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-sub"
+})
 
 export const metadata: Metadata = {
   title: "PKL 65 PML - STIS",
@@ -37,7 +55,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`font-sans antialiased`}>
+      <body className={`${rakkas.variable} ${ibmPlexSans.variable} ${yanoneKaffeesatz.variable} font-main antialiased`}>
         {children}
         <Analytics />
       </body>
