@@ -44,14 +44,14 @@ export default function LoginPage() {
                   <Image
                     src="/pkl/LOGO-PKL_REV8.png"
                     alt="Logo PKL"
-                    width={80}
-                    height={80}
+                    width={90}
+                    height={90}
                     className="object-contain"
                   />
                 </div>
               </div>
-              <h1 className="text-3xl font-bold text-white drop-shadow-md">PKL 65</h1>
-              <p className="mt-1 text-base text-white/90 font-medium">
+              <h1 className="text-5xl font-bold text-white drop-shadow-md">PKL 65</h1>
+              <p className="mt-1 text-3xl text-white/90 font-medium">
                 Sistem Pengawas Lapangan
               </p>
             </div>
@@ -61,7 +61,7 @@ export default function LoginPage() {
           <div className="p-10">
             <div className="mb-8 text-center">
               <h2 className="text-3xl font-bold text-foreground mb-3">Selamat Datang PML</h2>
-              <p className="text-base text-muted-foreground">
+              <p className="text-xl text-muted-foreground">
                 Silakan login dengan akun PML Anda!
               </p>
             </div>
@@ -69,7 +69,7 @@ export default function LoginPage() {
             <LoginForm />
 
             <div className="mt-8 pt-8 border-t border-border">
-              <p className="text-sm text-center text-muted-foreground">
+              <p className="text-xl text-center text-muted-foreground">
                 Sinergi Data, Pekerja GIG Berdaya, Yogyakarta Istimewa
               </p>
             </div>

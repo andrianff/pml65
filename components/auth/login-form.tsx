@@ -48,7 +48,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-foreground">
+        <Label htmlFor="email" className="text-foreground text-lg">
           Email
         </Label>
         <Input
@@ -57,13 +57,12 @@ export function LoginForm() {
           placeholder="nama@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border-input bg-input text-foreground"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-foreground">
+        <Label htmlFor="password" className="text-foreground text-lg">
           Password
         </Label>
         <Input
@@ -72,7 +71,7 @@ export function LoginForm() {
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border-input bg-input text-foreground"
+          className="border-input bg-input text-foreground text-lg"
           required
         />
       </div>
@@ -86,7 +85,7 @@ export function LoginForm() {
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+        className="w-full text-lg bg-primary hover:bg-primary/90 text-primary-foreground"
       >
         {isLoading ? "Memproses..." : "Login"}
       </Button>

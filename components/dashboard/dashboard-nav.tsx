@@ -21,19 +21,19 @@ export function DashboardNav() {
       <div className="p-6 border-b border-white">
         <div className="flex items-center gap-3">
           {/* Logo di kiri atas */}
-          <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-md border border-white">
+          <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-md border border-white">
             <Image
               src="/pkl/LOGO-PKL_REV8.png"
               alt="Logo PKL"
-              width={28}
-              height={28}
+              width={80}
+              height={80}
               className="object-contain"
             />
           </div>
           {/* Tulisan di samping logo */}
           <div className="leading-tight">
-            <h2 className="text-xl font-bold text-white">PKL 65</h2>
-            <p className="text-xs text-white/80">PML System</p>
+            <h2 className="text-4xl font-bold text-white">PKL 65</h2>
+            <p className="text-xl text-white/80">PML System</p>
           </div>
         </div>
       </div>
@@ -47,7 +47,7 @@ export function DashboardNav() {
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start transition-colors",
+                  "w-full text-lg justify-start transition-colors",
                   isActive
                     ? "bg-[#fffbdf] text-[#ef874b] font-semibold"
                     : "text-white hover:bg-[#fffbdf]/40 hover:text-white"
