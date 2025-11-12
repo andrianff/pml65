@@ -88,7 +88,7 @@ export function LoginForm() {
         disabled={isLoading}
         className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
       >
-        {isLoading ? "Memproses..." : "Masuk"}
+        {isLoading ? "Memproses..." : "Login"}
       </Button>
     </form>
   )
